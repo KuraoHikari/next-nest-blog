@@ -1,11 +1,11 @@
 "use server";
 
 import * as z from "zod";
-import bcrypt from "bcryptjs";
 import { NewPasswordSchema } from "@/schemas";
 import { getPasswordResetTokenByToken } from "@/data/password-reset-token";
 import { getUserByEmail } from "@/data/user";
 import { db } from "@/lib/db";
+import { hashedPassword } from "@/data/pasword-api";
 
 export const newPassword = async (
  values: z.infer<typeof NewPasswordSchema>,
@@ -47,11 +47,15 @@ export const newPassword = async (
   return { error: "Email does not exist!" };
  }
 
- const hashedPassword = await bcrypt.hash(password, 10);
+ const hash = await hashedPassword(password);
+
+ if (!hash) {
+  return { error: "Invalid Credentials" };
+ }
 
  await db.user.update({
   where: { id: existingUser.id },
-  data: { password: hashedPassword },
+  data: { password: hash },
  });
 
  await db.passwordResetToken.delete({

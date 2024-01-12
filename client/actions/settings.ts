@@ -1,7 +1,6 @@
 "use server";
 
 import * as z from "zod";
-import bcrypt from "bcryptjs";
 import { SettingsSchema } from "@/schemas";
 import { currentUser } from "@/lib/auth";
 import { getUserByEmail, getUserById } from "@/data/user";
@@ -9,6 +8,10 @@ import { db } from "@/lib/db";
 import { generateVerificationToken } from "@/lib/token";
 import { sendVerificationEmail } from "@/lib/mail";
 import { update } from "@/auth";
+import {
+ comparePassword,
+ hashedPassword,
+} from "@/data/pasword-api";
 
 export const settings = async (
  values: z.infer<typeof SettingsSchema>
@@ -55,7 +58,7 @@ export const settings = async (
   values.newPassword &&
   dbUser.password
  ) {
-  const passwordsMatch = await bcrypt.compare(
+  const passwordsMatch = await comparePassword(
    values.password,
    dbUser.password
   );
@@ -64,11 +67,12 @@ export const settings = async (
    return { error: "Incorrect password!" };
   }
 
-  const hashedPassword = await bcrypt.hash(
-   values.newPassword,
-   10
-  );
-  values.password = hashedPassword;
+  const hash = await hashedPassword(values.newPassword);
+
+  if (!hash) {
+   return { error: "Invalid Credentials" };
+  }
+  values.password = hash;
   values.newPassword = undefined;
  }
  const updatedUser = await db.user.update({

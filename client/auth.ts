@@ -52,6 +52,7 @@ export const {
    return true;
   },
   async session({ token, session }) {
+   console.log("Token masuk1");
    if (token.sub && session.user) {
     session.user.id = token.sub;
    }
@@ -63,26 +64,28 @@ export const {
    if (session.user) {
     session.user.isTwoFactorEnabled =
      token.isTwoFactorEnabled as boolean;
-   }
-
-   if (session.user) {
     session.user.name = token.name;
     session.user.email = token.email;
     session.user.isOAuth = token.isOAuth as boolean;
    }
-
+   console.log("Token masuk2");
    return session;
   },
   async jwt({ token }) {
+   console.log("Token masuk3");
    if (!token.sub) return token;
 
    const existingUser = await getUserById(token.sub);
-
+   console.log("Token masuk4");
    if (!existingUser) return token;
 
    const existingAccount = await getAccountByUserId(
     existingUser.id
    );
+
+   const nestApiToken = "";
+
+   token.nestApiToken = nestApiToken;
 
    token.isOAuth = !!existingAccount;
    token.name = existingUser.name;

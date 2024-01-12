@@ -38,3 +38,38 @@ export const hashedPassword = async (
   return null;
  }
 };
+
+export const comparePassword = async (
+ email: string,
+ password: string
+): Promise<boolean> => {
+ try {
+  const access_token = signJwt(
+   { email: email, password: password },
+   "ACCESS_TOKEN_PRIVATE_KEY",
+   {
+    expiresIn: `2m`,
+   }
+  );
+
+  const headers = new Headers({
+   "Content-Type": "application/json",
+   Authorization: `Bearer ${access_token}`,
+  });
+  const response = await fetch(
+   "http://localhost:8000/auth/compare-hash",
+   {
+    method: "GET",
+    headers: headers,
+   }
+  );
+
+  if (response.ok) {
+   return true;
+  } else {
+   throw "error";
+  }
+ } catch {
+  return false;
+ }
+};

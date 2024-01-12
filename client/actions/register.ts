@@ -21,10 +21,9 @@ export const register = async (
  const { email, password, name } = validatedFields.data;
 
  const hash = await hashedPassword(password);
- console.log("🚀 ~ file: register.ts:24 ~ hash:", hash);
 
  if (!hash) {
-  return { error: "Invalid Credentials P" };
+  return { error: "Invalid Credentials" };
  }
 
  const existingUser = await getUserByEmail(email);
