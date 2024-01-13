@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { db } from "@/lib/db";
 import { getPasswordResetTokenByEmail } from "@/data/password-reset-token";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
+import { signJwt } from "./jwt";
 
 export const generateTwoFactorToken = async (
  email: string
@@ -101,31 +102,16 @@ export const generatePasswordResetToken = async (
  return passwordResetToken;
 };
 
-export const generateNestApiToken = async (
- email: string
-) => {
- const token = uuidv4();
- const expires = new Date(
-  new Date().getTime() + 3600 * 1000
+export const generateNestApiToken = async (sub: string) => {
+ const expires = Date.now() + 10 * 1000;
+
+ const access_token = signJwt(
+  { sub: sub },
+  "ACCESS_TOKEN_PRIVATE_KEY",
+  {
+   expiresIn: `20m`,
+  }
  );
 
- const existingToken = await getPasswordResetTokenByEmail(
-  email
- );
-
- if (existingToken) {
-  await db.passwordResetToken.delete({
-   where: { id: existingToken.id },
-  });
- }
- const passwordResetToken =
-  await db.passwordResetToken.create({
-   data: {
-    email,
-    token,
-    expires,
-   },
-  });
-
- return passwordResetToken;
+ return { access_token, expires };
 };

@@ -7,6 +7,7 @@ import { getUserById } from "./data/user";
 import { UserRole } from "@prisma/client";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 import { getAccountByUserId } from "./data/account";
+import { generateNestApiToken } from "./lib/token";
 
 export const {
  handlers: { GET, POST },
@@ -68,7 +69,12 @@ export const {
     session.user.email = token.email;
     session.user.isOAuth = token.isOAuth as boolean;
    }
-   console.log("Token masuk2");
+
+   if (token.nestApiToken) {
+    session.nestApiToken = token.nestApiExpires as string;
+    session.nestApiExpires = token.nestApiExpires as number;
+   }
+
    return session;
   },
   async jwt({ token }) {
@@ -83,10 +89,6 @@ export const {
     existingUser.id
    );
 
-   const nestApiToken = "";
-
-   token.nestApiToken = nestApiToken;
-
    token.isOAuth = !!existingAccount;
    token.name = existingUser.name;
    token.email = existingUser.email;
@@ -94,7 +96,29 @@ export const {
    token.isTwoFactorEnabled =
     existingUser.isTwoFactorEnabled;
 
-   return token;
+   console.log(token.nestApiExpires);
+   if (!token.nestApiToken) {
+    const nestApiToken = await generateNestApiToken(
+     token.sub
+    );
+
+    token.nestApiToken = nestApiToken.access_token;
+    token.nestApiExpires = nestApiToken.expires;
+   }
+
+   if (Date.now() < token.nestApiExpires) {
+    return token;
+   }
+   console.log(token.nestApiExpires);
+   const nestApiToken = await generateNestApiToken(
+    token.sub
+   );
+
+   return {
+    ...token,
+    nestApiToken: nestApiToken.access_token,
+    nestApiExpires: nestApiToken.expires,
+   };
   },
  },
  adapter: PrismaAdapter(db),

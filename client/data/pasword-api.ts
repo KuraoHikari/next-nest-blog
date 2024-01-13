@@ -1,5 +1,6 @@
 import { signJwt } from "@/lib/jwt";
 
+//harusnya ini di lib
 export const hashedPassword = async (
  password: string
 ): Promise<string | null> => {
