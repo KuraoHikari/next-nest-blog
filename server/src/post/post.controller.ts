@@ -14,6 +14,7 @@ import { ApiCreatedResponse } from '@nestjs/swagger';
 import { CreatePostDto, CreatePostResponseDto } from './dto/post.dto';
 import { Pagination, PaginationParams } from 'src/utils/paginationParam';
 import { Sorting, SortingParams } from 'src/utils/sortingParam';
+import { Search, SearchParams } from 'src/utils/searchParam';
 
 @Controller('post')
 export class PostController {
@@ -39,7 +40,8 @@ export class PostController {
     @PaginationParams() paginationParams: Pagination,
     @SortingParams(['createdAt'])
     sort?: Sorting,
+    @SearchParams('title') search?: Search,
   ) {
-    return '';
+    return { paginationParams, sort, search };
   }
 }
