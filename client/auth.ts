@@ -53,7 +53,6 @@ export const {
    return true;
   },
   async session({ token, session }) {
-   console.log("Token masuk1");
    if (token.sub && session.user) {
     session.user.id = token.sub;
    }
@@ -71,18 +70,21 @@ export const {
    }
 
    if (token.nestApiToken) {
-    session.nestApiToken = token.nestApiExpires as string;
+    session.nestApiToken = token.nestApiToken as string;
     session.nestApiExpires = token.nestApiExpires as number;
    }
+
+   console.log(
+    "🚀 ~ session ~ session.nestApiToken:",
+    session.nestApiToken
+   );
 
    return session;
   },
   async jwt({ token }) {
-   console.log("Token masuk3");
    if (!token.sub) return token;
 
    const existingUser = await getUserById(token.sub);
-   console.log("Token masuk4");
    if (!existingUser) return token;
 
    const existingAccount = await getAccountByUserId(
@@ -96,7 +98,6 @@ export const {
    token.isTwoFactorEnabled =
     existingUser.isTwoFactorEnabled;
 
-   console.log(token.nestApiExpires);
    if (!token.nestApiToken) {
     const nestApiToken = await generateNestApiToken(
      token.sub
@@ -106,10 +107,10 @@ export const {
     token.nestApiExpires = nestApiToken.expires;
    }
 
-   if (Date.now() < token.nestApiExpires) {
+   if (Date.now() < Number(token.nestApiExpires)) {
     return token;
    }
-   console.log(token.nestApiExpires);
+
    const nestApiToken = await generateNestApiToken(
     token.sub
    );

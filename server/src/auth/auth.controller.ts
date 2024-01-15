@@ -42,19 +42,4 @@ export class AuthController {
       req.public.email,
     );
   }
-
-  @UseGuards(JwtPublicGuard)
-  @Get('/get-token')
-  @HttpCode(HttpStatus.OK)
-  getAccessToken(@Req() req: Request) {
-    const validatedFields = ComparePasswordSchema.safeParse(req.public);
-    if (!validatedFields.success) {
-      throw new UnauthorizedException();
-    }
-
-    return this.authService.compareHashPassword(
-      req.public.password,
-      req.public.email,
-    );
-  }
 }

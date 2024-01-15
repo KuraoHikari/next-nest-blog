@@ -5,6 +5,7 @@ import { ZodValidationPipe } from '@wahyubucil/nestjs-zod-openapi';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaClientExceptionFilter } from './prisma/prisma.exception';
 import { AuthModule } from './auth/auth.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   providers: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     PrismaModule,
     AuthModule,
+    PostModule,
   ],
 })
 export class AppModule {}

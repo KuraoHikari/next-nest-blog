@@ -103,13 +103,13 @@ export const generatePasswordResetToken = async (
 };
 
 export const generateNestApiToken = async (sub: string) => {
- const expires = Date.now() + 10 * 1000;
+ const expires = Date.now() + 900 * 1000;
 
  const access_token = signJwt(
   { sub: sub },
   "ACCESS_TOKEN_PRIVATE_KEY",
   {
-   expiresIn: `20m`,
+   expiresIn: `1d`,
   }
  );
 
