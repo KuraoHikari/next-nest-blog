@@ -8,7 +8,7 @@ export type FindOneWithAuthFunction = <T, K>(
 ) => Promise<FindOneWithAuthResult<T>>;
 
 export type AuthorizeOption = {
-  userId?: number | string;
+  sub?: number | string;
 };
 
 export interface PaginatedResult<T> {

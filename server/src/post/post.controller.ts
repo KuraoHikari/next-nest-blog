@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -36,7 +38,7 @@ export class PostController {
   @UseGuards(JwtGuard)
   @Get('/')
   @HttpCode(HttpStatus.OK)
-  getPost(
+  getPosts(
     @PaginationParams() paginationParams: Pagination,
     @SortingParams(['createdAt'])
     sort?: Sorting,
@@ -47,5 +49,19 @@ export class PostController {
       orderBy: sort,
       page: { perPage: paginationParams.size, page: paginationParams.page },
     });
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/:slug')
+  @HttpCode(HttpStatus.OK)
+  getPost(@Param('slug') slug: string) {
+    return this.postService.findOneBySlug(slug);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('/:id')
+  @HttpCode(HttpStatus.OK)
+  deletePost(@Param('id') id: string, @GetUser('sub') sub: string) {
+    return this.postService.deletePostById({ where: { id }, sub });
   }
 }

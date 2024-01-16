@@ -1,7 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
-import { PaginateFunction, PaginateOptions } from './dto/prisma.custom.dto';
+import {
+  AuthorizeOption,
+  FindOneWithAuthFunction,
+  PaginateFunction,
+  PaginateOptions,
+} from './dto/prisma.custom.dto';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
@@ -59,4 +64,24 @@ export class PrismaService extends PrismaClient {
       };
     };
   }
+
+  findOneWithAuth = (auth: AuthorizeOption): FindOneWithAuthFunction => {
+    if (!auth || auth.sub) {
+      throw new ForbiddenException('Access to resources denied222');
+    }
+
+    return async (model, args: any = { where: undefined }) => {
+      const data = await model.findUnique({
+        ...args,
+      });
+
+      if (!data || data.userId !== auth.sub) {
+        throw new ForbiddenException('Access to resources denied');
+      }
+
+      return {
+        data,
+      };
+    };
+  };
 }

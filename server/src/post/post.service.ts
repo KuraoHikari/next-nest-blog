@@ -32,7 +32,14 @@ export class PostService {
     return post;
   }
 
-  detail() {}
+  async findOneBySlug(slug: string): Promise<Post> {
+    const post = await this.prisma.post.findUnique({
+      where: {
+        slug: slug,
+      },
+    });
+    return post;
+  }
 
   async findMany({
     where,
@@ -51,5 +58,22 @@ export class PostService {
       },
       page,
     );
+  }
+
+  async deletePostById({
+    where,
+    sub,
+  }: {
+    where: Prisma.PostWhereInput;
+    sub: string;
+  }) {
+    await this.prisma.findOneWithAuth({ sub })(this.prisma.post, where);
+    await this.prisma.post.delete({
+      where: {
+        id: String(where.id),
+      },
+    });
+
+    return true;
   }
 }
