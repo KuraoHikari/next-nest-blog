@@ -42,6 +42,10 @@ export class PostController {
     sort?: Sorting,
     @SearchParams('title') search?: Search,
   ) {
-    return { paginationParams, sort, search };
+    return this.postService.findMany({
+      where: search,
+      orderBy: sort,
+      page: { perPage: paginationParams.size, page: paginationParams.page },
+    });
   }
 }

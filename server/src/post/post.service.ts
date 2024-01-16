@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto, CreatePostResponseDto } from './dto/post.dto';
+import { Post, Prisma } from '@prisma/client';
+import {
+  PaginateOptions,
+  PaginatedResult,
+} from 'src/prisma/dto/prisma.custom.dto';
 
 @Injectable()
 export class PostService {
@@ -27,7 +32,24 @@ export class PostService {
     return post;
   }
 
-  findMany() {}
-
   detail() {}
+
+  async findMany({
+    where,
+    orderBy,
+    page,
+  }: {
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationAndSearchRelevanceInput;
+    page?: PaginateOptions;
+  }): Promise<PaginatedResult<Post>> {
+    return this.prisma.paginator({ perPage: page.perPage })(
+      this.prisma.post,
+      {
+        where,
+        orderBy,
+      },
+      page,
+    );
+  }
 }

@@ -1,4 +1,8 @@
-import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  createParamDecorator,
+} from '@nestjs/common';
 import { Request } from 'express';
 
 export interface Search {
@@ -15,9 +19,15 @@ export const SearchParams = createParamDecorator(
 
     if (!searchQuery) return {};
 
-    const search = searchQuery.split('&').join(' & ');
+    const [property, value] = searchQuery.split(':');
 
-    const sortObjects: Search = { [validParams]: { search: search } };
+    if (property !== validParams) {
+      throw new BadRequestException('Invalid search parameter');
+    }
+
+    const search = value.split(' ').join(' & ');
+
+    const sortObjects: Search = { [property]: { search: search } };
 
     return sortObjects;
   },
