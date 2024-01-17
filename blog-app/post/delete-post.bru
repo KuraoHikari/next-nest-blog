@@ -1,20 +1,13 @@
 meta {
-  name: get-posts
+  name: delete-post
   type: http
-  seq: 1
+  seq: 4
 }
 
-get {
-  url: http://localhost:8000/post?page=0&size=2&sort=createdAt:asc&search=title:dog%20dodi%20pasar
+delete {
+  url: http://localhost:8000/post/clrh3vmjf000111kxjt7g8fhv
   body: none
   auth: none
-}
-
-query {
-  page: 0
-  size: 2
-  sort: createdAt:asc
-  search: title:dog%20dodi%20pasar
 }
 
 headers {

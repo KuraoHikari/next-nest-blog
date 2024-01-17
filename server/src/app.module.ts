@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PrismaClientExceptionFilter } from './prisma/prisma.exception';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   providers: [
@@ -25,6 +26,7 @@ import { PostModule } from './post/post.module';
     PrismaModule,
     AuthModule,
     PostModule,
+    CommentModule,
   ],
 })
 export class AppModule {}

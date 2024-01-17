@@ -66,13 +66,15 @@ export class PrismaService extends PrismaClient {
   }
 
   findOneWithAuth = (auth: AuthorizeOption): FindOneWithAuthFunction => {
-    if (!auth || auth.sub) {
-      throw new ForbiddenException('Access to resources denied222');
+    if (!auth || !auth.sub) {
+      throw new ForbiddenException('Access to resources denied');
     }
 
     return async (model, args: any = { where: undefined }) => {
       const data = await model.findUnique({
-        ...args,
+        where: {
+          ...args,
+        },
       });
 
       if (!data || data.userId !== auth.sub) {

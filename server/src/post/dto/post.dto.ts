@@ -17,7 +17,7 @@ export const Post = z
   .openapi('Post');
 
 export class CreatePostDto extends createZodDto(
-  Post.omit({ views: true, userId: true }),
+  Post.omit({ views: true, userId: true, slug: true }),
 ) {}
 
 export class CreatePostResponseDto extends createZodDto(Post) {}

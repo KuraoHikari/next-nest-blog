@@ -7,6 +7,7 @@ import {
   PaginateOptions,
   PaginatedResult,
 } from 'src/prisma/dto/prisma.custom.dto';
+import { slugify } from 'src/utils/slugify';
 
 @Injectable()
 export class PostService {
@@ -16,7 +17,9 @@ export class PostService {
     userId: string,
     dto: CreatePostDto,
   ): Promise<CreatePostResponseDto> {
-    const { title, slug, desc, catSlug, img } = dto;
+    const { title, desc, catSlug, img } = dto;
+
+    const slug = slugify(title);
 
     const post = await this.prisma.post.create({
       data: {
@@ -37,6 +40,7 @@ export class PostService {
       where: {
         slug: slug,
       },
+      include: { comments: true },
     });
     return post;
   }
