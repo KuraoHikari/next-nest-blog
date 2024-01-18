@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './dto/comment.dto';
-import { Comment } from '@prisma/client';
+import { Comment, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CommentService {
@@ -22,11 +22,28 @@ export class CommentService {
     const post = await this.prisma.comment.create({
       data: {
         userId,
-        postSlug: postSlug,
+        postSlug,
         desc,
       },
     });
 
     return post;
+  }
+
+  async deleteCommentById({
+    where,
+    sub,
+  }: {
+    where: Prisma.CommentWhereInput;
+    sub: string;
+  }) {
+    await this.prisma.findOneWithAuth({ sub })(this.prisma.comment, where);
+    await this.prisma.comment.delete({
+      where: {
+        id: String(where.id),
+      },
+    });
+
+    return true;
   }
 }

@@ -40,7 +40,19 @@ export class PostService {
       where: {
         slug: slug,
       },
-      include: { comments: true },
+      include: {
+        comments: {
+          include: {
+            user: {
+              select: {
+                email: true,
+                image: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
     return post;
   }

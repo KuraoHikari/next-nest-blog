@@ -1,15 +1,19 @@
 meta {
-  name: get-post
+  name: delete-comment
   type: http
-  seq: 3
+  seq: 2
 }
 
-get {
-  url: http://localhost:8000/post/aku-super-star
-  body: none
+delete {
+  url: http://localhost:8000/comment/clrhp79o00003nfh2rbax6daz
+  body: formUrlEncoded
   auth: none
 }
 
 headers {
   Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbHJmdzhsZ2owMDAwcDBmcWg0eWpzZ3gyIiwiaWF0IjoxNzA1NDkwNjA5LCJleHAiOjE3MDU1NzcwMDl9.E1c970WxZwTri-yWPvdD--CLkqy_jFEXazADjdsGFYJJVqwgUuG01XkOSeJ9FKcTBIXHyVNikL__hL47KBFCBTqykrlWi78qldlhwcomP7RWknNp8Paoq4c92AxgI5kCU2skre5NZjv3cgJ7NA-ekyMBCXE5_uylnH3Atw8QmYmpSUEA6CR-8j1sQtq6IEy55g_t7G8sjD-a3ku4yIUwdb93G9d-q3rjwopYp-2lBJZOkm8gVRb472HejsyaljufRJdT10EFj7SQNrB2rUqTYEO7T_XqF3WpdvzuFpd6DNYvwjoC7z0x1eNOzyrpbJZ-Oymgqb1D23sdWUquhcMstw
+}
+
+body:form-urlencoded {
+  desc: commen1
 }
