@@ -7,7 +7,11 @@ import {
   HttpStatus,
   Param,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator/get-user-decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
@@ -17,10 +21,16 @@ import { CreatePostDto, CreatePostResponseDto } from './dto/post.dto';
 import { Pagination, PaginationParams } from 'src/utils/paginationParam';
 import { Sorting, SortingParams } from 'src/utils/sortingParam';
 import { Search, SearchParams } from 'src/utils/searchParam';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CustomParseFilePipe } from 'src/utils/parse-file-pipe';
 
 @Controller('post')
 export class PostController {
-  constructor(private postService: PostService) {}
+  constructor(
+    private postService: PostService,
+    private cloudinary: CloudinaryService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Post('/')
@@ -28,11 +38,24 @@ export class PostController {
     type: CreatePostResponseDto,
   })
   @HttpCode(HttpStatus.CREATED)
-  createPost(
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(new ValidationPipe({ always: true }))
+  async createPost(
     @GetUser('sub') sub: string,
     @Body() createPostDto: CreatePostDto,
+    @UploadedFile(new CustomParseFilePipe(true)) file: Express.Multer.File,
   ) {
-    return this.postService.create(sub, createPostDto);
+    return await this.cloudinary
+      .uploadImage(file)
+      .then((data) => {
+        return this.postService.create(sub, createPostDto, data.secure_url);
+      })
+      .catch((err) => {
+        return {
+          statusCode: 400,
+          message: err.message,
+        };
+      });
   }
 
   @UseGuards(JwtGuard)
@@ -63,5 +86,27 @@ export class PostController {
   @HttpCode(HttpStatus.OK)
   deletePost(@Param('id') id: string, @GetUser('sub') sub: string) {
     return this.postService.deletePostById({ where: { id }, sub });
+  }
+
+  @Post('online')
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(new ValidationPipe({ always: true }))
+  async online(
+    @UploadedFile(new CustomParseFilePipe(true)) file: Express.Multer.File,
+  ) {
+    return await this.cloudinary
+      .uploadImage(file)
+      .then((data) => {
+        return {
+          statusCode: 200,
+          data: data.secure_url,
+        };
+      })
+      .catch((err) => {
+        return {
+          statusCode: 400,
+          message: err.message,
+        };
+      });
   }
 }

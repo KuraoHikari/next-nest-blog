@@ -16,8 +16,9 @@ export class PostService {
   async create(
     userId: string,
     dto: CreatePostDto,
+    img: string,
   ): Promise<CreatePostResponseDto> {
-    const { title, desc, catSlug, img } = dto;
+    const { title, desc, catSlug } = dto;
 
     const slug = slugify(title);
 
